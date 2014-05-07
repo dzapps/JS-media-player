@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Online Media Player</title>
+
+	<link href="css/ui-lightness/jquery-ui-1.10.4.css" rel="stylesheet">
+	
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+	
+	<link href="css/Site.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+	<nav class="navbar navbar-default" role="navigation">
+	  <div class="container-fluid">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+		  <a class="navbar-brand" href="index.html">Media player</a>
+		</div>
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		  <ul class="nav navbar-nav">
+			<li class="active"><a href="index.html">Player</a></li>
+			<li><a href="playlist.html">Playlist</a></li>			
+		  </ul>		  
+		</div><!-- /.navbar-collapse -->
+	  </div><!-- /.container-fluid -->
+	</nav>
+
+
+    <div class="container">
+		<div id ="player" class="panel panel-default">
+			<div id="currentInfo" class="panel-heading" data-id="0">Player controls</div>
+				<audio id="audio" preload controls>
+				  <source src="" type="audio/mpeg">
+					Your browser does not support the audio element.
+				</audio> 		
+			<div class="panel-body">				
+				<div class="controls">
+					<span id="prevSong" class="btn glyphicon glyphicon-step-backward"></span>
+					<span id="fastBackward" class="btn glyphicon glyphicon-fast-backward"></span>
+					<span id="backward" class="btn glyphicon glyphicon-backward"></span>
+					<span id="play" class="btn glyphicon glyphicon-play"></span>
+					<span id="stop" class="btn glyphicon glyphicon-stop"></span>
+					<span id="pause" class="btn glyphicon glyphicon-pause"></span>
+					<span id="forward" class="btn glyphicon glyphicon-forward"></span>
+					<span id="fastForward" class="btn glyphicon glyphicon-fast-forward"></span>
+					<span id="nextSong" class="btn glyphicon glyphicon-step-forward"></span>
+					<span id="shuffle" class="btn glyphicon glyphicon-random"></span>
+					<span id="repeat" class="btn glyphicon glyphicon-repeat"></span>
+				</div>
+			</div>
+		</div>		
+		
+		<div id="eq" class="panel panel-default" style="height:300px" >
+			<div class="panel-heading">EQ</div>
+			
+			<div class="panel-body">
+				<div>
+					<h4>Balance</h3>
+					<div id="slider"></div><div id="slider"></div>
+					
+					<div class="controls slider-controls">
+						<button class="btn panning-button" style="float:left" data-value="0">Left</button>
+						<button class="btn panning-button" data-value="50">Center</button>
+						<button class="btn panning-button" style="float:right" data-value="100">Right</button>
+					</div>				
+				</div>
+				<canvas id="fft" unselectable="on" height="200px" width="100%" >				
+					<p>blablanocanvas</p>
+				</canvas>
+			</div>
+		</div>
+		
+		<div id="playlist" class="panel panel-default" >
+			<div class="panel-heading">
+				Playlist
+				<span id="btnRefresh" class="btn glyphicon glyphicon-refresh"></span>
+			</div>
+			
+
+			<div id="songContainer" class="list-group" >
+				<a id="song1" class="list-group-item" href="#1" data-id="1" data-song="assets\Test.mp3" data-title="Test title">
+					<h4 class="list-group-item-heading">Test</h4>
+					<p class="list-group-item-text">Some info about the content.</p>
+				</a>
+				
+				<a id="song2" class="list-group-item" href="#2" data-id="2" data-song="assets\KRISKO - HORATA GOVORQT.mp3" data-title="Krisko - Horata govorqt">
+					<h4 class="list-group-item-heading">Krisko</h4>
+					<p class="list-group-item-text">Horata govorqt</p>
+				</a>
+			</div>			
+		</div>
+	</div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="js/jquery-1.10.2.js"></script>
+	<script src="js/jquery-ui-1.10.4.js"></script>
+	
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>		
+	
+	<script type="text/javascript">
+		function playClick(e) {
+			e.preventDefault();
+			var song = $('audio').get(0);
+			if (song.paused)
+				song.play();
+			else
+				song.pause();	
+		}
+		
+		function pauseClick(e) {
+			e.preventDefault();
+			var song = $('audio').get(0);
+			if (song.paused)
+				song.play();
+			else
+				song.pause();	
+		}
+		
+		function stopClick(e) {
+			e.preventDefault();
+			var song = $('audio').get(0);
+			
+			song.pause();
+			song.currentTime = 0;	
+		}
+		
+		function backwardClick(e) {
+			e.preventDefault();
+			var song = $('audio').get(0);
+						
+			song.currentTime -= 5;	
+		}
+		
+		function fastBackwardClick(e) {
+			e.preventDefault();
+			var song = $('audio').get(0);
+						
+			song.currentTime -= 30;	
+		}
+		
+		function forwardClick(e) {
+			e.preventDefault();
+			var song = $('audio').get(0);
+						
+			song.currentTime += 5;	
+		}
+		
+		function fastForwardClick(e) {
+			e.preventDefault();
+			var song = $('audio').get(0);
+						
+			song.currentTime += 30;	
+		}
+		
+		function prevSongClick() {
+			loadSong("#song" + getNextSong(false));
+		}
+		
+		function nextSongClick() {
+			loadSong("#song" + getNextSong(true));
+		}
+		
+		function shuffleClick(e) {
+			e.preventDefault();
+			
+			var shuffleAttr = $(this).data("shuffle");
+			$(this).data("shuffle", !shuffleAttr);
+			
+			
+			//New value that's why we use not
+			if (!shuffleAttr) {
+				$(this).css("color", "red");
+			}
+			else {
+				$(this).css("color", "");
+			}
+		}
+		
+		function repeatClick(e) {
+			e.preventDefault();
+			
+			var repeatAttr = $(this).data("repeat");
+			$(this).data("repeat", !repeatAttr);
+						
+			//New value that's why we use not
+			if (!repeatAttr) {
+				$(this).css("color", "red");
+			}
+			else {
+				$(this).css("color", "");
+			}
+		}
+		
+		function getNextSong(isNext) {
+			var shuffle = $("#shuffle").data("shuffle");
+			var songId = $("#currentInfo").attr("data-id");
+			
+			if (shuffle) {
+				var songCount = $(".list-group-item").length;
+				
+				do {
+					var randSongId = Math.floor((Math.random() * songCount) + 1);
+				} while (randSongId == songId);
+				
+				songId = randSongId;
+			}
+			else
+				if (isNext) {
+					songId++
+				}
+				else {
+					songId--
+				};
+				
+			return songId;
+		}
+		
+		function clearPlayerCtrls(everything) {
+			$(".list-group-item").each(function() {			
+				$(this).removeClass("active");
+			});
+			
+			//If we what to clear the audio controls
+			if (everything) {			
+				$("#currentInfo").attr("data-id", 0);
+				$('audio').get(0).src = "";
+			}
+		}
+		
+		function loadSong(id) {
+			var playlistItem = $(id);
+			if (!playlistItem || !playlistItem.length ) {				
+				return false;
+			}
+			
+			clearPlayerCtrls(false);				
+			playlistItem.addClass("active");
+			
+			$("#currentInfo").attr("data-id", playlistItem.data("id"));
+			$("#currentInfo").html("#" + playlistItem.data("id") + " " + playlistItem.data("title"));			
+			
+			var song = $('audio').get(0);
+			song.src = playlistItem.data("song");
+			song.play();
+			
+			return true;
+		}
+		
+		$(function() {		
+			$("#play").click(playClick);
+			$("#pause").click(pauseClick);
+			$("#stop").click(stopClick);
+			$("#backward").click(backwardClick);
+			$("#fastBackward").click(fastBackwardClick);
+			$("#forward").click(forwardClick);
+			$("#fastForward").click(fastForwardClick);
+			$("#fastForward").click(fastForwardClick);
+			$("#nextSong").click(nextSongClick);
+			$("#prevSong").click(prevSongClick);
+			$("#shuffle").click(shuffleClick);
+			$("#repeat").click(repeatClick);
+			
+			$(".list-group-item").click(function (e) {				
+				loadSong("#" + $(this).get(0).id);	
+				clearPlayerCtrls(true);
+			})
+			
+			 $( "#slider" ).slider({				
+				min: 0,
+				max: 100,
+				value: 50,
+				change: function(event, ui) {
+					alert(ui.value);
+				}
+			});	
+
+			$(".panning-button").click(function () {
+				var slider = $("#slider");
+				var value = $(this).data("value");				
+				slider.slider( "option", "value", value );
+			});
+			
+			$("audio").bind("ended", function(){ 
+				var repeat = $("#repeat").data("repeat");
+				if (repeat) {
+					$(this).get(0).play();
+				}
+				else {
+					nextSongClick();
+				}				
+			});
+			
+			var hasChangeFunc = function () {
+				var hash = window.location.hash;
+				var songId = hash.substring(hash.indexOf('#')+1);
+				var intRegex = /^\d+$/;
+				if(intRegex.test(songId)) {
+					loadSong("#song" + songId);
+				}
+			};
+			
+			hasChangeFunc();			
+			$(window).on('hashchange', hasChangeFunc);
+		});
+		
+		
+		
+        $(function(){
+            // Setup our method to retrieve the file list
+			var getFiles = function(){
+				var songContainer = $("#songContainer");
+				songContainer.empty();
+				
+				// Call the /dl/ directory, which should serve 
+				// back the directory-listing default page
+				// NOTE: This WILL NOT work if you have your server's 
+				// default index/home page in this folder, as that will
+				// be returned instead of a directory listing!
+				$.get("/assets/", function(data) {
+					// get a reference to the ul I want to populate
+					var $s    = $(".shell ul");
+					// get a list of a tags from the returned data
+					var links = $(data).find("a");
+					// for each item in links...
+					links.each(function(){
+						// extract the href attr
+						var href = $(this).attr("href");
+						// filter out any links you don't want to display... 
+											// in this case, I didn't want to display the 
+											// sort-links and any links starting with a /
+						if(href.charAt(0) != "?" && href.charAt(0) != "/"){
+							// append a new li with an anchor tag inside 
+													// it that has the href, and the link's text
+							$s.append("<li><a href=\"" + href + "\">" +
+																$(this).text() + "</a></li>");
+							}
+						});
+					});
+				};
+					// assign my click handler to #btnGet
+			$("#btnRefresh").click(getFiles);
+        });
+    </script>
+  </body>
+</html>

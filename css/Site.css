@@ -1,0 +1,23 @@
+audio {
+	width: 100%;
+	display: block;
+}
+
+.panel.panel-default {
+	margin-top:10px;
+}
+
+.controls {
+	position: relative;
+	margin: 0 auto;
+	text-align:center;
+    overflow:auto;
+}
+
+#slider {
+	width: 100%;	
+}
+
+.slider-controls {
+	margin-top: 5px;
+}

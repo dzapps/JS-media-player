@@ -10,8 +10,7 @@ audio {
 .controls {
 	position: relative;
 	margin: 0 auto;
-	text-align:center;
-    overflow:auto;
+	text-align:center;    
 }
 
 #slider {

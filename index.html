@@ -41,7 +41,7 @@
 
     <div class="container">
 		<div id ="player" class="panel panel-default">
-			<div id="currentInfo" class="panel-heading" data-id="0">Player controls</div>
+			<div id="currentInfo" class="panel-heading" data-id="0"># - Current song title</div>
 				<audio id="audio" preload controls>
 				  <source src="" type="audio/mpeg">
 					Your browser does not support the audio element.
@@ -91,15 +91,7 @@
 			
 
 			<div id="songContainer" class="list-group" >
-				<a id="song1" class="list-group-item" href="#1" data-id="1" data-song="assets\Test.mp3" data-title="Test title">
-					<h4 class="list-group-item-heading">Test</h4>
-					<p class="list-group-item-text">Some info about the content.</p>
-				</a>
 				
-				<a id="song2" class="list-group-item" href="#2" data-id="2" data-song="assets\KRISKO - HORATA GOVORQT.mp3" data-title="Krisko - Horata govorqt">
-					<h4 class="list-group-item-heading">Krisko</h4>
-					<p class="list-group-item-text">Horata govorqt</p>
-				</a>
 			</div>			
 		</div>
 	</div>
@@ -235,7 +227,8 @@
 			});
 			
 			//If we what to clear the audio controls
-			if (everything) {			
+			if (everything) {
+				$("#currentInfo").html("# - Current song title");
 				$("#currentInfo").attr("data-id", 0);
 				$('audio').get(0).src = "";
 			}
@@ -260,7 +253,10 @@
 			return true;
 		}
 		
-		$(function() {		
+		$(function() {	
+			jQuery.ajaxSetup({async:false});
+			clearPlayerCtrls(true);
+			
 			$("#play").click(playClick);
 			$("#pause").click(pauseClick);
 			$("#stop").click(stopClick);
@@ -304,6 +300,51 @@
 				}				
 			});
 			
+			// Setup our method to retrieve the file list
+			var getFiles = function(){
+				clearPlayerCtrls(true);
+				
+				var songContainer = $("#songContainer");
+				songContainer.empty();
+				
+				// Call the /dl/ directory, which should serve 
+				// back the directory-listing default page
+				// NOTE: This WILL NOT work if you have your server's 
+				// default index/home page in this folder, as that will
+				// be returned instead of a directory listing!
+				$.get("assets/", function(data) {					
+					// get a list of a tags from the returned data
+					var links = $(data).find("a");
+					// for each item in links...
+					var i = 1;
+					
+					links.each(function(){						
+						// extract the href attr
+						var href = $(this).attr("href");
+						// filter out any links you don't want to display... 
+											// in this case, I didn't want to display the 
+											// sort-links and any links starting with a /
+						if(href.indexOf(".mp3") > -1){							
+							// append a new li with an anchor tag inside 
+													// it that has the href, and the link's text
+							songContainer.append('<a id="song' + i + '" class="list-group-item" href="#' + i + '" data-id="'+ i +
+								'" data-song="assets\\'+ $(this).text() +'" data-title="' + $(this).text() + '">' +
+								'<h4 class="list-group-item-heading">'+ $(this).text() +'</h4>' +
+								'<p class="list-group-item-text">'+ href +'</p>' +
+								'</a>'
+							);
+							
+							i++;
+						}
+					});
+				});
+			};
+			
+			getFiles();
+			
+			// assign my click handler to #btnGet
+			$("#btnRefresh").click(getFiles);
+			
 			var hasChangeFunc = function () {
 				var hash = window.location.hash;
 				var songId = hash.substring(hash.indexOf('#')+1);
@@ -313,46 +354,9 @@
 				}
 			};
 			
-			hasChangeFunc();			
+			hasChangeFunc();
+			
 			$(window).on('hashchange', hasChangeFunc);
-		});
-		
-		
-		
-        $(function(){
-            // Setup our method to retrieve the file list
-			var getFiles = function(){
-				var songContainer = $("#songContainer");
-				songContainer.empty();
-				
-				// Call the /dl/ directory, which should serve 
-				// back the directory-listing default page
-				// NOTE: This WILL NOT work if you have your server's 
-				// default index/home page in this folder, as that will
-				// be returned instead of a directory listing!
-				$.get("/assets/", function(data) {
-					// get a reference to the ul I want to populate
-					var $s    = $(".shell ul");
-					// get a list of a tags from the returned data
-					var links = $(data).find("a");
-					// for each item in links...
-					links.each(function(){
-						// extract the href attr
-						var href = $(this).attr("href");
-						// filter out any links you don't want to display... 
-											// in this case, I didn't want to display the 
-											// sort-links and any links starting with a /
-						if(href.charAt(0) != "?" && href.charAt(0) != "/"){
-							// append a new li with an anchor tag inside 
-													// it that has the href, and the link's text
-							$s.append("<li><a href=\"" + href + "\">" +
-																$(this).text() + "</a></li>");
-							}
-						});
-					});
-				};
-					// assign my click handler to #btnGet
-			$("#btnRefresh").click(getFiles);
         });
     </script>
   </body>
